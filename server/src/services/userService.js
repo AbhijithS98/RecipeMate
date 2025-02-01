@@ -25,6 +25,23 @@ const googleLogin = async (googleToken) => {
   }
 };
 
+
+const clearCookie = async (req, res) =>{
+   
+  try {
+    res.cookie('refreshJwt', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== 'development',
+      sameSite: 'strict',
+      expires: new Date(0),  
+    });
+
+  } catch (error) {
+    error.name = 'ValidationError';  
+    throw error;
+  }
+}
+
 const createGoogleUser = async (email, name) => {
   const newUser = new User({
     name,
@@ -38,4 +55,5 @@ const createGoogleUser = async (email, name) => {
 
 export default {
   googleLogin,
+  clearCookie,
 };

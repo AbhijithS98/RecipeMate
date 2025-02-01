@@ -30,7 +30,7 @@ const Signup = () => {
   const handleGoogleSuccess = async (response) => {
     const token = response.credential;
     console.log("google token: ",token);
-    
+
     try {
         const res = await fetch(`${BACKEND_URL}/api/google-login`, {
           method: 'POST',

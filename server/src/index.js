@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import connectDB from './config/db.js';
 import userRoutes from './routes/UserRoutes.js'
 
 dotenv.config();
@@ -9,11 +10,14 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT;
 
+//connect to database
+connectDB();
+
 app.use(cors({
   origin: process.env.FRONTEND_URL,
   credentials: true,
   methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
-  allowedHeaders: 'Content-Type,Authorizaation'
+  allowedHeaders: 'Content-Type,Authorization'
 }));
 
 app.use(express.json());

@@ -25,8 +25,21 @@ const googleLogin = async (req, res, next) => {
   }
 };
 
+const logout = async (req, res, next) =>{
+  
+  try {
+    await userService.clearCookie(req,res);
+    res.status(200).json({ message: 'Logout successful' });
+
+  } catch (error) {
+    console.error('Logout error:', error);
+    next(error);
+  }
+}
+
 
 export default {
   googleLogin,
+  logout,
 };
 
