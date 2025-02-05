@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import connectDB from './config/db.js';
 import userRoutes from './routes/UserRoutes.js'
+import errorHandler from './middlewares/errorHandler.js';
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ app.use(express.urlencoded({ extended: true}));
 app.use(cookieParser());
 
 app.use('/api',userRoutes);
+app.use(errorHandler);
 
 app.get('/',(req,res)=>{
   res.send('server ready')

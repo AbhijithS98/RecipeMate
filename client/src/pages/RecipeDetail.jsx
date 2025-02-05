@@ -21,7 +21,7 @@ const RecipeDetails = () => {
   const saveRecipe = async(recipe)=>{
     if(!userInfo){
       toast.error("You need to be logged in..! Please Login.")
-      navigate("/sign-up")
+      navigate("/login")
       return
     }
 
@@ -53,12 +53,12 @@ const RecipeDetails = () => {
 
     try{
       const res = await api.post("/save-recipe",recipeData)
-      if (res.data.success) {
-        toast.success("Recipe saved successfully!");
-      }
+      // if (res.data.success) {
+      //   toast.success("Recipe saved successfully!");
+      // }
+      toast.success("Recipe saved successfully!");
     }catch(error){
       console.error("Error saving recipe:", error);
-      toast.error("Failed to save the recipe. Try again.");
     }
   };
 

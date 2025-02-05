@@ -1,4 +1,6 @@
+import mongoose from 'mongoose';
 import axios from "axios";
+import Recipe from '../models/RecipeModel.js';
 
 const API_KEY = process.env.SPOONACULAR_API_KEY;
 const baseURL = process.env.SPOONACULAR_BASE_URL;
@@ -46,3 +48,38 @@ export const fetchRecipeDetails = async (recipeId) => {
     throw new Error("Failed to fetch recipe details");
   }
 };
+
+
+export const isSavedRecipe = async ({userId,recipeId}) => {
+
+  try{
+    // Convert userId string to ObjectId
+    const objectId = new mongoose.Types.ObjectId(String(userId));
+
+    const recipe = await Recipe.findOne({ 
+      userId: objectId, 
+      recipeId
+    });
+
+    return !!recipe;
+  } catch(err){
+    
+    console.error("Error finding recipe", err.message);
+    throw new Error("Database failure");
+  }
+}
+
+
+
+export const createRecipe = async(recipeData) => {
+  try{
+    
+    const newRecipe = new Recipe(recipeData);
+    await newRecipe.save();
+    return newRecipe;
+
+  } catch(error){
+    console.error("Error creating recipe", error.message);
+    throw new Error("Database Error");
+  }
+}

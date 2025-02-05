@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from 'react-redux';
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import { setCredentials } from "../redux/slices/userAuthSlice";
 import signupCover from '../assets/signup-cover.jpg'
@@ -15,16 +16,42 @@ const Signup = () => {
     name: "",
     email: "",
     password: "",
+    confirmPassword: ""
   });
+
+  const { name, email, password, confirmPassword } = formData;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("User Registered:", formData);
-    // TODO: Send formData to backend API for signup
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    };
+
+    try {
+    
+      const response = await axios.post(`${BACKEND_URL}/api/register`, {
+        name,
+        email,
+        password,
+      });
+
+      // Handle successful registration
+      if (response.status === 201) {
+        toast.success('Signup successful!');
+        setFormData({ name: '', email: '', password: '', confirmPassword: '' });
+        navigate("/login")      
+      }
+    } catch (error) {
+      const errMsg = error.response?.data?.message;
+      toast.error(errMsg || 'Registration failed. Please try again.');
+      console.error('Error during signup:', error);
+    }
+    
   };
 
   const handleGoogleSuccess = async (response) => {
@@ -76,7 +103,7 @@ const Signup = () => {
               name="name"
               className="form-control"
               placeholder="Enter your name"
-              value={formData.name}
+              value={name}
               onChange={handleChange}
               required
             />
@@ -89,7 +116,7 @@ const Signup = () => {
               name="email"
               className="form-control"
               placeholder="Enter your email"
-              value={formData.email}
+              value={email}
               onChange={handleChange}
               required
             />
@@ -102,7 +129,20 @@ const Signup = () => {
               name="password"
               className="form-control"
               placeholder="Enter your password"
-              value={formData.password}
+              value={password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label">ConfirmPassword</label>
+            <input
+              type="password"
+              name="confirmPassword"
+              className="form-control"
+              placeholder="Confirm your password"
+              value={confirmPassword}
               onChange={handleChange}
               required
             />
@@ -113,9 +153,7 @@ const Signup = () => {
 
         <div className="text-center my-3">OR</div>
 
-        {/* <button className="btn btn-danger w-100" onClick={handleGoogleLogin}>
-          <i className="bi bi-google"></i> Login with Google
-        </button> */}
+       
         <GoogleLogin
                 onSuccess={handleGoogleSuccess}
                 onError={handleGoogleFailure}

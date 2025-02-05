@@ -1,17 +1,57 @@
 import generateTokens from "../utils/generateTokens.js";
 import userService from '../services/userService.js'
-import { fetchRecipes,fetchRecipeDetails } from "../services/recipeService.js";
+import  jwt  from "jsonwebtoken";
 
+
+const login = async(req, res, next) => {  
+
+    try {
+      const { Email, password } = req.body;          
+      const {user,token} = await userService.login(Email,password,res)
+      
+      res.status(201).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        token
+      });
+
+    } catch (err) {    
+      console.error("Error in login:", err.message);
+      err.name = 'ValidationError';
+      next(err);
+    }
+}
+         
+
+
+const register = async(req, res, next) => {  
+
+  try {
+    const { name, email, password } = req.body;           
+    const newUser = await userService.registerUser({ name,email,password });
+      
+    res.status(201).json({
+      message: 'User successfully registered',
+      user: newUser,
+    });
+
+  } catch (err) {    
+    console.error("Error in register:", err.message);
+    err.name = 'ValidationError';
+    next(err);
+  }
+}
 
 
 
 const googleLogin = async (req, res, next) => {
+
   try {
+
     const { googleToken } = req.body;
     if (!googleToken) {
-      const error = new Error("The verifyIdToken method requires an ID Token");
-      error.name = "ValidationError";
-      throw error;
+      throw new Error("The verifyIdToken method requires an ID Token");
     }
 
     const googleUser = await userService.googleLogin(googleToken);
@@ -23,8 +63,10 @@ const googleLogin = async (req, res, next) => {
       email: googleUser.email,
       token,
     });
+
   } catch (error) {
-    console.error("Error logging in with Google:", error.message);
+    console.error("Error in google login:", error.message);
+    err.name = 'ValidationError';
     next(error);
   }
 };
@@ -41,63 +83,48 @@ const logout = async (req, res, next) =>{
 
   } catch (error) {
     console.error('Logout error:', error);
+    err.name = 'ValidationError';
     next(error);
   }
 }
 
 
 
-const searchRecipes = async (req, res) => {
-  console.log("hitt SRRRRRRRRRRRRRRRR");
-  
-  try {
-    // Extract the query parameter from request
-    const { query } = req.query;
 
-    if (!query) {
-      return res.status(400).json({ message: "Query parameter is required" });
-    }
+const refreshToken = async(req, res, next) => {
+  const refreshToken = req.cookies.refreshJwt;
+
+  if (!refreshToken) {
+    console.log("no refresh token in the cookie")
+    res.status(401).json({ message: 'No refresh token provided, authorization denied' });
+    return;
+  } 
+
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const accessToken = jwt.sign({ userId: decoded.userId }, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: '10m',
+    });
     
-    const recipes = await fetchRecipes(query);
+    console.log("refreshed access token");
     
-    // Send response back to frontend
-    res.json(recipes);
+    res.json({ accessToken });
   } catch (error) {
-    console.error("Error fetching recipes:", error.message);
-    res.status(500).json({ message: "Server error" });
+    console.error('Refresh token error:', error.message);
+    await userService.clearCookie(req,res);
+    res.status(403).json({ message: 'Invalid or expired refresh token' });
   }
 };
 
 
 
-
-
-const getRecipeDetails = async (req, res) => {
-  console.log("hitt RDDDDDDDDDDDDDDDDDDDDDDDD");
-  try {
-    // Extract the query parameter from request
-    const { recipeId } = req.query;
-    console.log("recipe id: ",recipeId);
-    if (!recipeId) {
-      return res.status(400).json({ message: "RecipeId is required" });
-    }
-    
-    const recipeDetails = await fetchRecipeDetails(recipeId);
-    console.log("recipe details: ",recipeDetails);
-    
-    // Send response back to frontend
-    res.json(recipeDetails);
-  } catch (error) {
-    console.error("Error fetching recipes:", error.message);
-    res.status(500).json({ message: "Server error" });
-  }
-};
 
 
 export default {
+  login,
   googleLogin,
   logout,
-  searchRecipes,
-  getRecipeDetails,
+  refreshToken,
+  register,
 };
 

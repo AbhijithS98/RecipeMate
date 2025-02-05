@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const RecipeSchema = new mongoose.Schema({
   userId: {
@@ -52,4 +52,7 @@ const RecipeSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-module.exports = mongoose.model("Recipe", RecipeSchema);
+
+const Recipe = mongoose.model("Recipe", RecipeSchema);
+
+export default Recipe;

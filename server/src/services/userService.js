@@ -1,5 +1,6 @@
 import User from "../models/UserModel.js";
 import { GoogleTokenVerify } from "../utils/googleTokenVerify.js";
+import generateTokens from "../utils/generateTokens.js";
 
 const googleLogin = async (googleToken) => {
   try {
@@ -19,11 +20,57 @@ const googleLogin = async (googleToken) => {
     }
 
     return googleUser;
-  } catch (error) {
-    console.error('Google login error:', error);
-    throw new Error('Error occurred during Google login');
+
+  } catch (error) {   
+    throw error;
   }
-};
+}
+
+
+const login = async (email, password, res) =>{
+    
+  try {   
+    console.log("email is: ",email);
+     
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      throw new Error('Invalid password');
+    }
+
+    const token = generateTokens(res,user._id)
+    return {user,token};
+
+  } catch (error) {  
+    throw error;
+  }
+}
+
+
+
+
+
+const registerUser = async ({name, email, password}) => {
+  try {
+    
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {  
+      throw new Error('User already registerd with this email');
+    }
+
+    const newUser = new User({ name, email, password });  
+    await newUser.save();
+    return newUser;
+
+  } catch (error) {   
+    throw error;
+  }
+}
+
 
 
 const clearCookie = async (req, res) =>{
@@ -36,11 +83,15 @@ const clearCookie = async (req, res) =>{
       expires: new Date(0),  
     });
 
-  } catch (error) {
-    error.name = 'ValidationError';  
+  } catch (error) {  
+    
     throw error;
   }
+
 }
+
+
+
 
 const createGoogleUser = async (email, name) => {
   const newUser = new User({
@@ -56,4 +107,6 @@ const createGoogleUser = async (email, name) => {
 export default {
   googleLogin,
   clearCookie,
+  login,
+  registerUser,
 };
