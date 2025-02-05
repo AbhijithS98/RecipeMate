@@ -48,6 +48,10 @@ const Header = () => {
               <a className="nav-link" href="#" onClick={() => navigate("/explore-recipes")}>Explore</a>
             </li>
             {userInfo? (
+              <>
+              <li className="nav-item">
+              <a className="nav-link" href="/saved-recipes">Saved recipes</a>
+              </li>
               <li className="nav-item">
                   <button
                   className="btn btn-outline-light"
@@ -57,6 +61,7 @@ const Header = () => {
                   <span>Logout</span>
                 </button>
               </li>
+              </>
             ) : 
             (
               <li className="nav-item">

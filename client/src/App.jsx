@@ -5,6 +5,7 @@ import Signup from './pages/SignUp';
 import Login from './pages/Login';
 import ExploreRecipes from './pages/ExploreRecipies';
 import RecipeDetails from './pages/RecipeDetail';
+import SavedRecipes from './pages/SavedRecipes';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import './App.css';
@@ -21,6 +22,7 @@ function App() {
         <Route path='/login' element={<Login />}/>
         <Route path='/explore-recipes' element={<ExploreRecipes />}/>
         <Route path='/recipe-detail' element={<RecipeDetails />}/>
+        <Route path='/saved-recipes' element={<SavedRecipes />}/>
       </Routes>
       <Footer />
       <ToastContainer />

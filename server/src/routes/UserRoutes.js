@@ -16,5 +16,6 @@ router.post('/refresh-token',userController.refreshToken);
 router.get('/recipes/search',RecipeController.searchRecipes);
 router.get('/recipes/details',RecipeController.getRecipeDetails);
 router.post('/save-recipe',verifyUserToken,RecipeController.saveRecipe);
+router.get('/saved-recipes',verifyUserToken,RecipeController.getSavedRecipes);
 
 export default router;

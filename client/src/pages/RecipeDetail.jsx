@@ -20,7 +20,7 @@ const RecipeDetails = () => {
 
   const saveRecipe = async(recipe)=>{
     if(!userInfo){
-      toast.error("You need to be logged in..! Please Login.")
+      toast.info("You need to be logged in..! Please Login.")
       navigate("/login")
       return
     }

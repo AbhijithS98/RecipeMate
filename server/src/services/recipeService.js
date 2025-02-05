@@ -83,3 +83,16 @@ export const createRecipe = async(recipeData) => {
     throw new Error("Database Error");
   }
 }
+
+
+
+export const fetchSavedRecipes = async (userId) => {
+
+  try {
+    return await Recipe.find({ userId })
+    
+  } catch (error) {
+    console.error("Error finding saved recipes:", error.message);
+    throw new Error("Failed to fetch saved recipes");
+  }
+}

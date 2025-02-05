@@ -2,6 +2,7 @@ import { fetchRecipes,
   fetchRecipeDetails,
   isSavedRecipe,
   createRecipe,
+  fetchSavedRecipes
 } from "../services/recipeService.js";
 
 
@@ -79,9 +80,29 @@ const saveRecipe = async (req, res, next) => {
 
 
 
+const getSavedRecipes = async (req, res, next) => {
+  
+  try {
+    const {userId} = req.user;
+    const savedRecipes = await fetchSavedRecipes(userId);
+    console.log("saved: ",savedRecipes);
+    
+    // Send response back to frontend
+    res.json(savedRecipes);
+
+  } catch (error) {
+    console.error("Error fetching saved recipes:", error.message);
+    error.name = 'ValidationError';
+    next(error);
+  }
+};
+
+
+
 
 export default {
   searchRecipes,
   getRecipeDetails,
   saveRecipe,
+  getSavedRecipes,
 };
