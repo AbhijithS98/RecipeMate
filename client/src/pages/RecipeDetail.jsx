@@ -33,7 +33,7 @@ const RecipeDetails = () => {
     // Prepare the recipe data object
     const recipeData = {
       userId: userInfo._id,
-      recipeId: recipe.id,
+      recipeId: recipe.id || recipe.recipeId,
       title: recipe.title,
       image: recipe.image,
       summary: recipe.summary,
